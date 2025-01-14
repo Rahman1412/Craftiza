@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.example.craftiza.utils";
+option java_multiple_files = true;
+
+message UserPrefernces{
+  optional uint32 id = 1;
+  optional string email = 2;
+  optional string password = 3;
+  optional string name = 4;
+  optional string role = 5;
+  optional string avatar = 6;
+  optional string creationAt = 7;
+  optional string updatedAt = 8;
+}
