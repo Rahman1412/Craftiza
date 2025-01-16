@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.craftiza.pages.SplashPage
+import com.example.craftiza.pages.afterAuth.HomePage
 
 @Composable
 fun Navigation(){
@@ -18,6 +19,8 @@ fun Navigation(){
         composable(Route.Splash){
             SplashPage(navController)
         }
-
+        composable(AfterAuthRoute.Home.route) {
+            HomePage(navController)
+        }
     }
 }
