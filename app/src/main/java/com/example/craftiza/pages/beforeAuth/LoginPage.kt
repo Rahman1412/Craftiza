@@ -4,11 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -18,10 +22,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,6 +55,7 @@ fun LoginPage(
     val password = loginvm.password.collectAsState()
     val token by loginvm.token.observeAsState()
     val isLoading by loginvm.isLoading.collectAsState()
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(token) {
         if(token?.accessToken != "" && token?.accessToken != null){
@@ -59,7 +71,7 @@ fun LoginPage(
     }
     Scaffold { padding->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding)
+            modifier = Modifier.fillMaxSize().imePadding()
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_logo),
@@ -68,8 +80,10 @@ fun LoginPage(
                 alignment = Alignment.Center
             )
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize().background(color = Color.White, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 20.dp).weight(2f)
+                modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()
+                    .clip(shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                    .background(color = Color.White)
+                    .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 40.dp).weight(2f)
             ) {
                 OutlinedTextField(
                     value = email.value.value,
@@ -83,9 +97,11 @@ fun LoginPage(
                     isError = email.value.isError,
                     supportingText = {
                         Text(email.value.error)
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true
                 )
-                HeightSpacer(20)
+                HeightSpacer(10)
                 OutlinedTextField(
                     value = password.value.value,
                     onValueChange = {
@@ -98,9 +114,26 @@ fun LoginPage(
                     isError = password.value.isError,
                     supportingText = {
                         Text(password.value.error)
+                    },
+                    singleLine = true,
+                    visualTransformation = if(isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                isPasswordVisible = !isPasswordVisible
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    if(isPasswordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                                ),
+                                contentDescription = "Toggle Password"
+                            )
+                        }
                     }
                 )
-                HeightSpacer(30)
+                HeightSpacer(20)
                 Button(
                     onClick = {
                         loginvm.doLogin()
