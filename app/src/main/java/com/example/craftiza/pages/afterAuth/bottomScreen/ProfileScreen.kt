@@ -1,6 +1,7 @@
 package com.example.craftiza.pages.afterAuth.bottomScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -39,6 +41,7 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.craftiza.R
 import com.example.craftiza.navigation.AfterAuthRoute
+import com.example.craftiza.pages.component.HeightSpacer
 import com.example.craftiza.vm.HomeVM
 import com.example.craftiza.vm.ProfileVM
 
@@ -62,39 +65,44 @@ fun ProfileScreen(
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ){
-                    AsyncImage(
-                        model = user?.avatar,
-                        contentDescription = "Image",
-                        placeholder = painterResource(R.drawable.ic_user),
-                        error = painterResource(R.drawable.ic_user),
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(shape = CircleShape),
-                        contentScale = ContentScale.Crop,
-                    )
-                    Column(
-                        modifier = Modifier.padding(20.dp)
-                    ) {
-                        Text(
-                            user?.name ?: "",
-                            style = TextStyle(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        AsyncImage(
+                            model = user?.avatar,
+                            contentDescription = "Image",
+                            placeholder = painterResource(R.drawable.ic_user),
+                            error = painterResource(R.drawable.ic_user),
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(shape = CircleShape),
+                            contentScale = ContentScale.Crop,
                         )
-                        Spacer(modifier = Modifier.height(5.dp))
-                        Text(
-                            user?.email ?: "",
-                            style = TextStyle(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        Column(
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Text(
+                                user?.name ?: "",
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(
+                                user?.email ?: "",
+                                style = TextStyle(
+                                    fontWeight = FontWeight.SemiBold
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                     IconButton(
                         onClick = {
@@ -108,6 +116,7 @@ fun ProfileScreen(
                     }
                 }
             }
+            HeightSpacer(16)
             ElevatedButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {

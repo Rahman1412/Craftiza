@@ -16,6 +16,7 @@ import com.example.craftiza.data.SignUp
 import com.example.craftiza.repository.SignupRepository
 import com.example.craftiza.repository.UploadFileRepository
 import com.example.craftiza.utils.NetworkHelper
+import com.example.craftiza.utils.ToastUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +49,7 @@ class SignupVM @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading : StateFlow<Boolean> = _isLoading
 
-    private var toast: Toast? = null
+
 
     private val _nowLoggedIn = MutableStateFlow<Boolean>(false)
     val nowLoggedIn : StateFlow<Boolean> = _nowLoggedIn
@@ -94,7 +95,7 @@ class SignupVM @Inject constructor(
     fun uploadImage(bitmap:Bitmap){
         _isBottomSheet.value = false
         if(!networkHelper.isNetworkConnected()){
-            displayToast("Please check your internet connection!")
+            ToastUtils.displayToast(context,"Please check your internet connection!")
             return
         }
         viewModelScope.launch {
@@ -141,7 +142,7 @@ class SignupVM @Inject constructor(
 
     fun doSignup(){
         if(!networkHelper.isNetworkConnected()){
-            displayToast("Please check your internet connection!")
+            ToastUtils.displayToast(context,"Please check your internet connection!")
             return
         }
         viewModelScope.launch {
@@ -153,28 +154,21 @@ class SignupVM @Inject constructor(
                 avatar = _image.value ?: ""
             )
             try{
-                val response = signupRepo.signup(data);
-                Log.d("Response","${response}")
+                val response = signupRepo.signup(data)
                 if(response.isSuccessful){
                     val data = response.body()
+                    _isLoading.value = false
                     _nowLoggedIn.value = true
-                    displayToast("User registered successfully!")
+                    ToastUtils.displayToast(context,"User registered successfully!")
                 }else{
-                    displayToast("Something went wrong, Please try again!")
+                    throw Exception("Unable to Signup, Please try again")
                 }
-                _isLoading.value = false
             }catch (e : Exception){
                 _isLoading.value = false
-                displayToast("Something went wrong, Please try again!")
+                ToastUtils.displayToast(context,e.message.toString())
             }
         }
     }
 
-    private fun displayToast(message: String = "") {
-        Handler(Looper.getMainLooper()).post {
-            toast?.cancel()
-            toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-            toast?.show()
-        }
-    }
+
 }

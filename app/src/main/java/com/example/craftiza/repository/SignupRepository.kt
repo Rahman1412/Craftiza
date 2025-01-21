@@ -64,4 +64,8 @@ class SignupRepository @Inject constructor(
     suspend fun signup(data:SignUp) : Response<User> {
         return apiService.signup(data)
     }
+
+    suspend fun updateProfile(id:Int,user:SignUp):Response<User>{
+        return apiService.updateUser(id,user)
+    }
 }

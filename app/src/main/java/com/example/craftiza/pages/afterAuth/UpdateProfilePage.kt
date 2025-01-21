@@ -1,5 +1,9 @@
 package com.example.craftiza.pages.afterAuth
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,12 +32,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +51,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.craftiza.R
+import com.example.craftiza.pages.component.BottomSheet
+import com.example.craftiza.pages.component.Loader
 import com.example.craftiza.vm.UpdateProfileVM
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +69,52 @@ fun UpdateProfilePage(
     var isVisible by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val image by vm.image.collectAsState()
+    val isLoading by vm.isLoading.collectAsState()
+    val focusManager = LocalFocusManager.current
+    val isBottomSheet by vm.isBottomSheet.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    val dismissBottomSheet : () -> Unit = {
+        vm.toggleBottomSheet(false)
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.run {
+            dismissBottomSheet()
+            vm.uploadFile(bitmap,"bitmap")
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.run {
+            dismissBottomSheet()
+            vm.uploadFile(uri,"uri")
+        }
+    }
+
+    val launchCamera : () -> Unit = {
+        coroutineScope.launch {
+            cameraLauncher.launch()
+        }
+    }
+
+    val launchGallery : () -> Unit = {
+        coroutineScope.launch {
+            galleryLauncher.launch("image/*")
+        }
+    }
+
+    if(isLoading){
+        Loader()
+    }
+
+    if(isBottomSheet){
+        BottomSheet(dismissBottomSheet,launchCamera,launchGallery)
+    }
 
     Scaffold(
         topBar = {
@@ -105,6 +160,7 @@ fun UpdateProfilePage(
                 )
                 IconButton(
                     onClick = {
+                        vm.toggleBottomSheet(true)
                     },
                     modifier = Modifier.padding(
                         top = 60.dp,
@@ -174,7 +230,8 @@ fun UpdateProfilePage(
             )
             Button(
                 onClick = {
-
+                    focusManager.clearFocus()
+                    vm.updateProfile()
                 },
                 enabled = name.isEnable && email.isEnable && password.isEnable,
                 modifier = Modifier.fillMaxWidth()
@@ -183,6 +240,7 @@ fun UpdateProfilePage(
             }
             Button(
                 onClick = {
+                    focusManager.clearFocus()
                     navController.navigateUp()
                 },
                 enabled = navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED,

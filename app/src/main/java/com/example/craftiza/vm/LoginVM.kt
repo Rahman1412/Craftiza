@@ -16,6 +16,7 @@ import com.example.craftiza.data.Token
 import com.example.craftiza.repository.LoginRepository
 import com.example.craftiza.repository.StorageRepository
 import com.example.craftiza.utils.NetworkHelper
+import com.example.craftiza.utils.ToastUtils
 import com.example.craftiza.utils.TokenPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -56,7 +57,7 @@ class LoginVM @Inject constructor(
             withContext(Dispatchers.IO) {
                 networkInfo.isNetworkAvailable.collectLatest { available ->
                     if (!available) {
-                        displayToast("Internet Unavailable!");
+                        ToastUtils.displayToast(context,"Internet Unavailable!");
                     }
                 }
             }
@@ -100,27 +101,18 @@ class LoginVM @Inject constructor(
                             val user = loginRepo.profile(data.access_token);
                             user.body()?.let { storageRepo.updateUser(it) }
                             storageRepo.updateToken(data)
+                            ToastUtils.displayToast(context,"Logged In Successfully!")
                         }
                     } else {
-                        _isLoading.value = false
-                        displayToast("Something went wrong, Please try again!")
+                        throw Exception("Unable to login, Please try after sometimes!")
                     }
                 } catch (e: Exception) {
                     _isLoading.value = false
-                    displayToast("Something went wrong, Please try again!")
+                    ToastUtils.displayToast(context,e.message.toString())
                 }
             }
         } else {
-            displayToast("Please check your internet connection!")
-        }
-    }
-
-
-    private fun displayToast(message: String = "") {
-        Handler(Looper.getMainLooper()).post {
-            toast?.cancel()
-            toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-            toast?.show()
+            ToastUtils.displayToast(context,"Please check your internet connection!")
         }
     }
 
