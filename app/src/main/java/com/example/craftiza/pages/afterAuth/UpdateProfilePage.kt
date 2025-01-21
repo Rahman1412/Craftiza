@@ -185,7 +185,8 @@ fun UpdateProfilePage(
                 isError = name.isError,
                 supportingText = {
                     Text(name.error)
-                }
+                },
+                singleLine = true
             )
             OutlinedTextField(
                 value = email.value,
@@ -199,7 +200,8 @@ fun UpdateProfilePage(
                 isError = email.isError,
                 supportingText = {
                     Text(email.error)
-                }
+                },
+                singleLine = true
             )
             OutlinedTextField(
                 value = password.value,
@@ -226,7 +228,8 @@ fun UpdateProfilePage(
                             contentDescription = "Toggle Password"
                         )
                     }
-                }
+                },
+                singleLine = true
             )
             Button(
                 onClick = {
