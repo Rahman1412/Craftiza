@@ -2,10 +2,13 @@ package com.example.craftiza.vm
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.craftiza.data.FormField
@@ -114,6 +117,28 @@ class SignupVM @Inject constructor(
         }
     }
 
+    fun uploadFile(uri:Uri){
+        viewModelScope.launch {
+            try{
+                _isBottomSheet.value = false
+                _isLoading.value = true;
+                val file = uploadFileRepo.uriToFile(uri,context);
+                val response = uploadFileRepo.uploadFile(file)
+                if(response.isSuccessful){
+                    val data = response.body()
+
+                    if(data != null){
+                        _image.value = data.location
+                    }
+                    _isLoading.value = false
+                }
+            }catch(e: Exception){
+                _isLoading.value = false
+                Log.d("Error","${e.message}")
+            }
+        }
+    }
+
     fun doSignup(){
         if(!networkHelper.isNetworkConnected()){
             displayToast("Please check your internet connection!")
@@ -129,6 +154,7 @@ class SignupVM @Inject constructor(
             )
             try{
                 val response = signupRepo.signup(data);
+                Log.d("Response","${response}")
                 if(response.isSuccessful){
                     val data = response.body()
                     _nowLoggedIn.value = true

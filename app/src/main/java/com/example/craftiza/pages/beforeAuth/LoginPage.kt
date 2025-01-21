@@ -1,4 +1,5 @@
 package com.example.craftiza.pages.beforeAuth
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -56,11 +59,13 @@ fun LoginPage(
     val token by loginvm.token.observeAsState()
     val isLoading by loginvm.isLoading.collectAsState()
     var isPasswordVisible by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val user by loginvm.user.observeAsState()
 
-    LaunchedEffect(token) {
-        if(token?.accessToken != "" && token?.accessToken != null){
-            navController.navigate(AfterAuthRoute.Home.route){
-                popUpTo(Route.PreAuth){
+    LaunchedEffect(user) {
+        if(user != null && user?.id != 0) {
+            navController.navigate(Route.PostAuth) {
+                popUpTo(Route.PreAuth) {
                     inclusive = true
                 }
             }
@@ -136,6 +141,7 @@ fun LoginPage(
                 HeightSpacer(20)
                 Button(
                     onClick = {
+                        focusManager.clearFocus()
                         loginvm.doLogin()
                     },
                     modifier = Modifier.fillMaxWidth(),

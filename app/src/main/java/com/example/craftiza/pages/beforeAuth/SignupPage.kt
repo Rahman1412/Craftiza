@@ -76,7 +76,7 @@ fun SignupPage(
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
-        if (bitmap != null) {
+        bitmap?.let{
             signupvm.uploadImage(bitmap)
         }
     }
@@ -84,7 +84,9 @@ fun SignupPage(
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        Log.d("Uri","${uri}")
+        uri?.let{
+            signupvm.uploadFile(uri);
+        }
     }
 
     val dismissBottomSheet : () -> Unit = {
@@ -103,12 +105,9 @@ fun SignupPage(
         }
     }
 
-
     if(isBottomSheet){
         BottomSheet(dismissBottomSheet,launchCamera,launchGallery)
     }
-
-
 
     val name by signupvm.name.collectAsState()
     val email by signupvm.email.collectAsState()
@@ -159,7 +158,7 @@ fun SignupPage(
                             modifier = Modifier
                                 .size(120.dp)
                                 .clip(CircleShape),
-                            contentScale = ContentScale.Fit,
+                            contentScale = ContentScale.Crop,
                         )
                         IconButton(
                             onClick = {

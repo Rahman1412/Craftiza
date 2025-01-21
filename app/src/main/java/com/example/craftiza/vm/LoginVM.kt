@@ -42,6 +42,7 @@ class LoginVM @Inject constructor(
 
     private var toast: Toast? = null
     val token = storageRepo.token.asLiveData()
+    val user = storageRepo.user.asLiveData();
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading;
@@ -96,6 +97,8 @@ class LoginVM @Inject constructor(
                         _isLoading.value = false
                         val data = response.body();
                         if (data != null) {
+                            val user = loginRepo.profile(data.access_token);
+                            user.body()?.let { storageRepo.updateUser(it) }
                             storageRepo.updateToken(data)
                         }
                     } else {
@@ -103,7 +106,7 @@ class LoginVM @Inject constructor(
                         displayToast("Something went wrong, Please try again!")
                     }
                 } catch (e: Exception) {
-                    _isLoading.value = true
+                    _isLoading.value = false
                     displayToast("Something went wrong, Please try again!")
                 }
             }
@@ -118,6 +121,12 @@ class LoginVM @Inject constructor(
             toast?.cancel()
             toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
             toast?.show()
+        }
+    }
+
+    fun clear(){
+        viewModelScope.launch {
+            storageRepo.clearToken();
         }
     }
 }

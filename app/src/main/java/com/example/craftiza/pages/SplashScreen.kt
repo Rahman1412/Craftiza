@@ -34,11 +34,20 @@ fun SplashPage(
     val user by vm.user.observeAsState()
 
     LaunchedEffect(Unit) {
-        delay(2000)
-        if(token?.accessToken != ""){
-            navController.navigate(AfterAuthRoute.Home.route){
-                popUpTo(Route.Splash){
-                    inclusive = true
+        delay(3000)
+        if(token != null && token?.accessToken != ""){
+            token?.accessToken?.let { vm.updateUser(it) };
+            if(user !=null && user?.id != 0){
+                navController.navigate(AfterAuthRoute.Home.route){
+                    popUpTo(Route.Splash){
+                        inclusive = true
+                    }
+                }
+            }else{
+                navController.navigate(Route.PreAuth){
+                    popUpTo(Route.Splash){
+                        inclusive = true
+                    }
                 }
             }
         }else{

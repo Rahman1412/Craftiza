@@ -15,12 +15,10 @@ fun Navigation(){
         navController = navController,
         startDestination = Route.Splash
     ){
-        BeforeAuthNavigation(navController)
         composable(Route.Splash){
             SplashPage(navController)
         }
-        composable(AfterAuthRoute.Home.route) {
-            HomePage(navController)
-        }
+        BeforeAuthNavigation(navController)
+        AfterAuthNavigation(navController)
     }
 }

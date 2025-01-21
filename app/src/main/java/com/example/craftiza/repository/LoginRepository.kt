@@ -3,6 +3,7 @@ package com.example.craftiza.repository
 import android.util.Patterns
 import com.example.craftiza.data.Login
 import com.example.craftiza.data.Token
+import com.example.craftiza.data.User
 import com.example.craftiza.network.ApiService
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,6 +16,10 @@ class LoginRepository @Inject constructor(
 
     suspend fun login(login:Login):Response<Token>{
         return apiService.login(login);
+    }
+
+    suspend fun profile(token:String):Response<User>{
+        return apiService.profile("Bearer $token");
     }
 
 

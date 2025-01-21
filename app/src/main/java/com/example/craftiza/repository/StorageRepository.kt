@@ -3,6 +3,7 @@ package com.example.craftiza.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import com.example.craftiza.data.Token
+import com.example.craftiza.data.User
 import com.example.craftiza.utils.TokenPreferences
 import com.example.craftiza.utils.UserPrefernces
 import kotlinx.coroutines.flow.Flow
@@ -33,8 +34,19 @@ class StorageRepository @Inject constructor(
             }
         }
 
-    fun updateUser(){
-
+    suspend fun updateUser(user:User){
+        userDataStore.updateData { preferences ->
+            preferences.toBuilder()
+                .setId(user.id)
+                .setName(user.name)
+                .setEmail(user.email)
+                .setPassword(user.password)
+                .setRole(user.role)
+                .setUpdatedAt(user.updatedAt)
+                .setCreationAt(user.creationAt)
+                .setAvatar(user.avatar)
+                .build()
+        }
     }
 
     suspend fun updateToken(token:Token){
@@ -49,6 +61,9 @@ class StorageRepository @Inject constructor(
     suspend fun clearToken(){
         tokenDataStore.updateData {
             TokenPreferences.getDefaultInstance()
+        }
+        userDataStore.updateData {
+            UserPrefernces.getDefaultInstance()
         }
     }
 }
