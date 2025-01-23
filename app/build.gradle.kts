@@ -93,6 +93,9 @@ dependencies {
     implementation("androidx.paging:paging-runtime:$paging_version")
     implementation("androidx.paging:paging-compose:3.3.5")
 
+    //Dexter Permission Dependency
+    implementation("com.karumi:dexter:6.2.3")
+
 }
 
 kapt {

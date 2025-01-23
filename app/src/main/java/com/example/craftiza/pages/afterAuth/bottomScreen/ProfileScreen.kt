@@ -1,5 +1,8 @@
 package com.example.craftiza.pages.afterAuth.bottomScreen
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +46,7 @@ import coil3.compose.AsyncImage
 import com.example.craftiza.R
 import com.example.craftiza.navigation.AfterAuthRoute
 import com.example.craftiza.pages.component.HeightSpacer
+import com.example.craftiza.utils.ToastUtils
 import com.example.craftiza.vm.HomeVM
 import com.example.craftiza.vm.ProfileVM
 
@@ -54,6 +59,17 @@ fun ProfileScreen(
     val homevm : HomeVM = hiltViewModel()
     val profilevm : ProfileVM = hiltViewModel()
     val user by profilevm.user.observeAsState()
+    val context = LocalContext.current
+    val openSetting : () -> Unit = {
+        try{
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package",context.packageName, null)
+            intent.data = uri
+            context.startActivity(intent)
+        }catch (e:Exception){
+            ToastUtils.displayToast(context,e.message.toString())
+        }
+    }
     Box(
         modifier = Modifier.fillMaxSize().padding(paddingValues)
     ){
@@ -124,6 +140,15 @@ fun ProfileScreen(
                 }
             ) {
                 Text("Logout")
+            }
+            HeightSpacer(16)
+            ElevatedButton(
+                onClick = {
+                    openSetting()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Grant Permission")
             }
         }
     }

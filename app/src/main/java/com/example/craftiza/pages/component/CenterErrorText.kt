@@ -12,19 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CenterErrorText(message: String = "",refresh : () -> Unit){
+fun CenterErrorText(message: String = "",refresh : () -> Unit,isDisplay:Boolean = true){
     Box(
         modifier = Modifier.fillMaxSize().padding(20.dp),
         contentAlignment = Alignment.Center
     ){
         Column {
             Text(message)
-            ElevatedButton(
-                onClick = {
-                    refresh()
+            if(isDisplay) {
+                ElevatedButton(
+                    onClick = {
+                        refresh()
+                    }
+                ) {
+                    Text("Refresh Now")
                 }
-            ) {
-                Text("Refresh Now")
             }
         }
     }

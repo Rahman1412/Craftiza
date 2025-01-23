@@ -1,6 +1,7 @@
 package com.example.craftiza.network
 
 import androidx.compose.ui.geometry.Offset
+import com.example.craftiza.data.Category
 import com.example.craftiza.data.Login
 import com.example.craftiza.data.Product
 import com.example.craftiza.data.SignUp
@@ -51,6 +52,7 @@ interface ApiService {
         @Body data: SignUp
     ):Response<User>
 
-
+    @GET("categories")
+    suspend fun getCategory():Response<List<Category>>
 
 }

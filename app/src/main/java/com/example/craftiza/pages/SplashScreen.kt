@@ -2,6 +2,7 @@ package com.example.craftiza.pages
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -61,10 +62,9 @@ fun SplashPage(
     }
 
     Scaffold { padding ->
-        Column(
+        Box(
             modifier = Modifier.fillMaxSize().padding(padding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_logo),
