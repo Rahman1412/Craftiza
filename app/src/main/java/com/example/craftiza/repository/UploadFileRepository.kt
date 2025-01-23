@@ -39,34 +39,37 @@ class UploadFileRepository @Inject constructor(
     fun bitmapToFile(bitmap: Bitmap, context: Context): File {
         val file = File(context.cacheDir, "captured_image.jpg")
         val outputStream: OutputStream = FileOutputStream(file)
-        val rotatedBitmap = rotateBitmapIfNeeded(bitmap, file)
+        //Not Working RotateBitmapIfNeeded Function
+        val rotatedBitmap = rotateBitmapIfNeeded(bitmap, context)
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         outputStream.flush()
         outputStream.close()
         return file
     }
 
-    fun rotateBitmapIfNeeded(bitmap: Bitmap, file: File): Bitmap {
-        val exifInterface: ExifInterface
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            exifInterface = ExifInterface(file)
-        } else {
-            val inputStream = file.inputStream()
-            exifInterface = ExifInterface(inputStream)
+    fun rotateBitmapIfNeeded(bitmap: Bitmap, context: Context): Bitmap {
+        val orientation = getDeviceOrientation(context)
+        val rotationAngle = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> 0
         }
-        val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-        return when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
-            else -> bitmap
+
+        return if (rotationAngle != 0) {
+            val matrix = Matrix()
+            matrix.postRotate(rotationAngle.toFloat())
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        } else {
+            bitmap
         }
     }
 
-    fun rotateBitmap(bitmap: Bitmap, degrees: Float): Bitmap {
-        val matrix = android.graphics.Matrix()
-        matrix.postRotate(degrees)
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    fun getDeviceOrientation(context: Context): Int {
+        val file = File(context.cacheDir, "temp.jpg")
+        file.createNewFile()
+        val exif = ExifInterface(file.absolutePath)
+        return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
     }
 
     fun uriToFile(uri: Uri, context: Context): File {
